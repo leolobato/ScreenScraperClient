@@ -21,12 +21,12 @@ public class ScreenScraper {
         public let devPassword: String
         public let client: String
 
-        public let username: String
-        public let password: String
+        public let username: String?
+        public let password: String?
 
         public let debugMode: Bool
 
-        public init(devId: String, devPassword: String, client: String, username: String, password: String, debugMode: Bool = false) {
+        public init(devId: String, devPassword: String, client: String, username: String? = nil, password: String? = nil, debugMode: Bool = false) {
             self.devId = devId
             self.devPassword = devPassword
             self.client = client
@@ -53,13 +53,14 @@ public class ScreenScraper {
     }
 
     private func clientConfigParams() -> [(String, String)] {
-        return [
+        var params = [
             ("devid", config.devId),
             ("devpassword", config.devPassword),
-            ("softname", config.client),
-            ("ssid", config.username),
-            ("sspassword", config.password),
+            ("softname", config.client)
         ]
+        if let username = config.username { params.append(("ssid", username)) }
+        if let password = config.password { params.append(("sspassword", password)) }
+        return params
     }
 
     public func getGame(filename: String, filesize: UInt64?, identifiers: [FileIdentifier], romType: RomType, platform: Platform) async throws -> GameInfo {
