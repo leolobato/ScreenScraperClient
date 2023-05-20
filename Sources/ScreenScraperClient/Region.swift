@@ -11,7 +11,7 @@
 
 import Foundation
 
-public enum Region: String, Codable {
+public enum Region: String, Codable, CaseIterable {
     case wor
     case eu
     case us

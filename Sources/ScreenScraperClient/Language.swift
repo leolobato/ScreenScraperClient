@@ -10,7 +10,7 @@
  */
 import Foundation
 
-public enum Language: String, Codable {
+public enum Language: String, Codable, CaseIterable {
     case en
     case fr
     case de

@@ -152,9 +152,29 @@ public struct LanguageEnabledText: Codable {
     }
 }
 
+public extension Array where Element: Equatable {
+
+    mutating func sort(topPriority: [Element]) {
+        for item in topPriority.reversed() {
+            guard let index = self.firstIndex(of: item) else { continue }
+            self.remove(at: index)
+            self.insert(item, at: 0)
+        }
+    }
+
+}
+
 public extension Array where Element: RegionEnabled {
-    func preferred(_ preferredRegions: [Region]) -> Element? {
-        let regions = preferredRegions.map({ $0.rawValue })
+    func preferred(_ preferredRegions: [Region], exclusively: Bool = false) -> Element? {
+        let sortedRegions: [Region]
+        if exclusively {
+            sortedRegions = preferredRegions
+        } else {
+            var regions = Region.allCases
+            regions.sort(topPriority: preferredRegions)
+            sortedRegions = regions
+        }
+        let regions = sortedRegions.map({ $0.rawValue })
         let sorted = self.filter({ regions.contains($0.region) }).sorted { item1, item2 in
             let index1 = regions.firstIndex(of: item1.region)
             let index2 = regions.firstIndex(of: item2.region)
@@ -171,8 +191,16 @@ public extension Array where Element: RegionEnabled {
 }
 
 public extension Array where Element: OptionalRegionEnabled {
-    func preferred(_ preferredRegions: [Region]) -> Element? {
-        let regions = preferredRegions.map({ $0.rawValue })
+    func preferred(_ preferredRegions: [Region], exclusively: Bool = false) -> Element? {
+        let sortedRegions: [Region]
+        if exclusively {
+            sortedRegions = preferredRegions
+        } else {
+            var regions = Region.allCases
+            regions.sort(topPriority: preferredRegions)
+            sortedRegions = regions
+        }
+        let regions = sortedRegions.map({ $0.rawValue })
         let sorted = self.filter({ regions.contains($0.region ?? "") }).sorted { item1, item2 in
             let index1 = regions.firstIndex(of: item1.region ?? "")
             let index2 = regions.firstIndex(of: item2.region ?? "")
@@ -189,8 +217,16 @@ public extension Array where Element: OptionalRegionEnabled {
 }
 
 public extension Array where Element == LanguageEnabledText {
-    func preferred(_ languages: [Language]) -> LanguageEnabledText? {
-        let preferredLanguages = languages.map({ $0.rawValue })
+    func preferred(_ languages: [Language], exclusively: Bool = false) -> LanguageEnabledText? {
+        let sortedLanguages: [Language]
+        if exclusively {
+            sortedLanguages = languages
+        } else {
+            var allLanguages = Language.allCases
+            allLanguages.sort(topPriority: languages)
+            sortedLanguages = allLanguages
+        }
+        let preferredLanguages = sortedLanguages.map({ $0.rawValue })
         let sorted = self.filter({ preferredLanguages.contains($0.language) }).sorted { item1, item2 in
             let index1 = preferredLanguages.firstIndex(of: item1.language)
             let index2 = preferredLanguages.firstIndex(of: item2.language)
